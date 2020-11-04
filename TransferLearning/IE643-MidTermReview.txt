@@ -1,0 +1,29 @@
+
+
+
+Problem at hand -
+The problem that the paper deals with is to build a Text-to-speech system than can generate natural speech. The paper aims at achieveing this in an data efficient manner. Therefore, given a few seconds of untranscibed audio as refernce, the model would synthesize new speech in the speaker's voice. This all happends without updating any parameters i.e. zero-shot learning.
+
+Motivation -
+As such
+
+Background - 
+Lets dive into history a bit and look at the previous works that have led to this revolutionary paper. Let me hand over to Yateesh.
+
+Architecture -
+Instead of the boring text, lets swtich to the picture.
+
+Architecture image -
+That's better. The model is divided into 3 parts-
+1. Speaker Encoder - A recurrent speaker encoder that maps a mel-spectogram to a ﬁxed d-dimensional vector. This basically captures the features of the individual speech.
+2. Synthesizer - Sequence-to-sequence synthesizer which predicts a log-mel spectrogram from a sequence of phoneme inputs. It encodes the sequence and concatenates it with the encoder output which is then passed on further to the attention and decoder for the final spectogram output.
+3. Vocoder - An autoregressive WaveNet vocoder to convert the generated spectrogram from the synthesizer into time domain waveforms i.e. speech signals.
+
+Lets dive into more technical details of the architecture-
+
+Speaker Encoder -
+The encoder consists of 3 LSTM layers of 768 cells, followed by projection to 256 dimensions.
+
+
+-----
+Synthesizer wali slide me ye bhi add ayega ki Tacotron2 consists of Encoder which outputs an embedding vector which is further given to decoder to generate mel spectrogram. In extended version used in paper, speaker embeddings is concatenated to encoder embedding before påssing to decoder
