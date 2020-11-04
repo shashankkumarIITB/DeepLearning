@@ -1,29 +1,60 @@
+Good evening everyone, This is team Google2 and we are here for the mid-term project review. The research paper assigned to us is Tranfer Learning from Speaker Verification to Multispeaker Text to Speech Synthesis
 
+Let me welcome my teammates Yateesh and Mahesh. Lets start with the presentation.
 
+Outline -
+We will start with the problem and motivation followed by some background. Then we will get into the intricasies of the paper and finally end it modifications. We will have a quick demo if time permits.
 
 Problem at hand -
 The problem that the paper deals with is to build a Text-to-speech system than can generate natural speech. The paper aims at achieveing this in an data efficient manner. Therefore, given a few seconds of untranscibed audio as refernce, the model would synthesize new speech in the speaker's voice. This all happends without updating any parameters i.e. zero-shot learning.
 
 Motivation -
-As such
+The paper takes a step in the direction of solving the following problems. 
+Restore communication to users who have lost their voice and are are not able to provide many new training examples, transferring voice across languages for more natural speech-to-speech translation, and generating realistic speech from text in low resource settings
 
 Background - 
-Lets dive into history a bit and look at the previous works that have led to this revolutionary paper. Let me hand over to Yateesh.
+Lets dive into history a bit and look at the previous works that have led to this revolutionary paper.
 
 Architecture -
-Instead of the boring text, lets swtich to the picture.
+The solution proposed by the paper is to use a archtecture consisting of 3 different neural networks. We have a visual representation of the architecture here.
 
 Architecture image -
-That's better. The model is divided into 3 parts-
-1. Speaker Encoder - A recurrent speaker encoder that maps a mel-spectogram to a ﬁxed d-dimensional vector. This basically captures the features of the individual speech.
-2. Synthesizer - Sequence-to-sequence synthesizer which predicts a log-mel spectrogram from a sequence of phoneme inputs. It encodes the sequence and concatenates it with the encoder output which is then passed on further to the attention and decoder for the final spectogram output.
-3. Vocoder - An autoregressive WaveNet vocoder to convert the generated spectrogram from the synthesizer into time domain waveforms i.e. speech signals.
+The model is divided into 3 parts-
+1. Speaker Encoder - A recurrent speaker encoder that maps a mel-spectogram to a ﬁxed dimensional embedding vector, known as d-vector. This basically captures the features of the individual speech.
+2. Synthesizer - Sequence-to-sequence synthesizer which predicts a log-mel spectrogram from a sequence of phoneme inputs. It encodes the sequence and concatenates it with the encoder output, which is then passed on further to the decoder for the final spectogram output.
+3. Vocoder - An autoregressive WaveNet vocoder to convert, the generated spectrogram, from the synthesizer into time domain waveforms i.e. speech signals.
 
 Lets dive into more technical details of the architecture-
 
 Speaker Encoder -
-The encoder consists of 3 LSTM layers of 768 cells, followed by projection to 256 dimensions.
+It is used for conditioning the synthesis network on a reference speech signal from the desired speaker. It is based on a speaker dicriminative model that is trained on a text-independent task to verify speaker. It uses generalised end-to-end speaker verification architecture which is highly scalable and accurate. The encoder consists of 3 LSTM layers of 768 cells, followed by projection to 256 dimensions. The input to the encoder consists of speech of 40-channel log-mel spectogram. Final embedding is created by L2 normalizing the output of the top layer at the final frame. 
 
+Synthesizer - 
+It uses a recurrent sequence-to-sequence with attention Tacotron2 architecture to support multiple speakers similar to DeepVoice2. The embedding vector from the encoder is concatenated with the the synthesizer encoder and passed on to the decoder to generate log-mel spectograms. The input to the synthesizer is a sequence of phonemes with the expected target audio as the output. Transfer learning is used where the encoder parameter remain unchanged during the synthesizer learning. An additional L1 loss is added along with the L2 loss on the predicted spectogram. This combined loss is robust to noisy data.
 
------
-Synthesizer wali slide me ye bhi add ayega ki Tacotron2 consists of Encoder which outputs an embedding vector which is further given to decoder to generate mel spectrogram. In extended version used in paper, speaker embeddings is concatenated to encoder embedding before påssing to decoder
+Vocoder - 
+Autoregressive WaveNet encoder as proposed by the Tacotron2 architecture with 30-dilated convolutional layers is used. The input are the mel-spectograms from the synthesizer which produce time-domain waveframes as output. 
+
+Datasets -
+VCTK and LibriSpeech are used to train the synthesizer and the vocoder. Preprocessing is done on VCTK dataset which involves downsampling the audio and trimming the leading and trailing silence. For the LibriSpeech dataset, an ASR model is used for breaking segments of silence and reducing the median duration from 14 seconds to 5 seconds. The datasets are divided into train, validation and test sets.
+The speaker encoder was trained on LibriSpeech and a proprietary dataset, which is not used for the synthesis network.
+Additional datasets like LibriSpeechOther, VoxCeleb and VoxCeleb2 are also used in experiments.
+
+Experiments -
+The experiments primarily relies on subjective listening and uses Mean Opinion Score or MOS. The results are primarily evaluated along two dimensions - naturalness and similarity of the real speech to the target speech. 
+Other experiments consist of speaker verification, training the encoder on a larger dataset and using fictitious speakers. 
+The MOS scores are used to compare as to how natural and similar the generated speech is when compared to the target audio. MOS scale ranges from 1 to 5 with 0.5 as step size and 5 being the most similar.
+
+Speech naturalness -
+As can be seen by the MOS values, ground truth values are quite close to 5 for both the datasets. The proposed model performs well on the seen dataset. Also, VCTK has higher MOS scores indicating the cleaner data present in the dataset.
+
+Speaker embedding space -
+The speaker embeddings can be visualised for both human and synthesized speech. The plot on the left indicates the high similarity between the synthesized and human speech. The one on the right shows that the synthetic utterances are distinguishable from the human ones. 
+
+Apart from naturalness and similarity, speaker verification is performed with a new speaker encoder with the same network architecture. Speaker verification Equal Error Rates or SVEER are calculated to measure the degree of error. From the drastic difference in error rates on the two datasets, it can be concluded that the speech resembles the target speaker but cannot be confused with a real speaker.
+
+Next slide -
+Increasing the number of training examples for the speaker encoder reduces the error and at the same time incresing the MOS scores.
+
+Let me hand over to Yateesh for the final part.
+
