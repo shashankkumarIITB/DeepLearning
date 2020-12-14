@@ -1,0 +1,71 @@
+******************************************************************************************************************************************
+ENCODER
+******************************************************************************************************************************************
+
+---------------------------------
+DATASETS
+---------------------------------
+File = ./encoder/config.py (Contains the details of the datasets used along with the anglophone nationalities for the VoxCeleb datasets)
+LibriSpeech, VoxCeleb1, VoxCeleb2
+---------------------------------
+
+---------------------------------
+DATA SPLITS
+---------------------------------
+File = ./encoder/config.py
+Training uses the default splits of the datasets.
+---------------------------------
+
+---------------------------------
+PREPROCESSING 
+---------------------------------
+File = ./encoder_preprocess.py (Wrapper for the preprocessing part)
+
+File = ./encoder/preprocess.py (Preprocessing functions for each dataset)
+
+File = ./encoder/audio.py
+Modules = 
+1. webrtcvad (Used for removing trailing silence and noice removal from the datasets)
+2. librosa (Used to load audio files, resampling, generating mel spectograms)
+Procedure = 
+Load the input waveform, resample it, normalize the volume and trim long silences.
+Convert the processed waveforms into log-mel spectograms
+
+File = ./encoder/params_data.py (Contains the parameters for data preprocessing such audio sampling rate, mel-spectorgram details, loudness, maximum silent frames allowed etc.)
+---------------------------------
+
+---------------------------------
+NEURAL NETWORK STRUCTURE
+---------------------------------
+File = ./encoder/model.py
+Neural network consists of three layers-
+1. LSTM consisting of 3 layers, with input size of 40, and hidden layer size of 256
+2. Linear layer with 256 input and output features
+3. ReLU as the last layer
+
+---------------------------------
+
+
+---------------------------------
+TRAINING FUNCTION
+---------------------------------
+---------------------------------
+
+---------------------------------
+LOSS FUNCTION
+---------------------------------
+---------------------------------
+
+---------------------------------
+OPTIMIZER
+---------------------------------
+---------------------------------
+
+---------------------------------
+HYPERPARAMETERS
+---------------------------------
+File = ./encoder/parmas_model.py
+Learning rate used is (10 ** -4) with 64 speakers per batch and 10 utterances per speaker
+---------------------------------
+
+******************************************************************************************************************************************
